@@ -1,25 +1,41 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>act Platform</title>
+    <title>PSYOP | Cognitive Interface</title>
     <style>
         :root {
-            --primary-color: #00ff41;
-            --secondary-color: #008f11;
-            --background-color: #001100;
-            --text-color: #00ff41;
+            --primary-color: #ff003c; /* Neon Red/Pink */
+            --secondary-color: #7000ff; /* Deep Violet */
+            --background-color: #050505;
+            --text-color: #ff003c;
+            --glow: 0 0 10px rgba(255, 0, 60, 0.7);
         }
 
         body {
             margin: 0;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Consolas', 'Courier New', monospace;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: url('pixelwave.hr/wp-content/uploads/webp-converter-temp/tradingterminal.png') no-repeat center center fixed;
-            background-size: cover;
+            background: var(--background-color);
+            color: var(--text-color);
             overflow: hidden;
+        }
+
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
         }
 
         #matrix-background {
@@ -29,339 +45,244 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            opacity: 0.5;
+            opacity: 0.3;
         }
 
         .terminal-window {
-            background: rgba(0, 17, 0, 0.9);
-            width: 850px;
-            height: 550px;
-            border: 2px solid var(--primary-color);
-            border-radius: 4px;
+            background: rgba(10, 0, 0, 0.95);
+            width: 900px;
+            height: 600px;
+            border: 1px solid var(--primary-color);
             position: relative;
-            color: var(--text-color);
-            box-shadow: 
-                0 0 10px var(--primary-color), 
-                inset 0 0 10px var(--secondary-color);
+            box-shadow: var(--glow), inset 0 0 20px rgba(112, 0, 255, 0.2);
             z-index: 2;
             display: flex;
             flex-direction: column;
-            font-size: 14px;
+            animation: glitch-border 5s infinite;
+        }
+
+        @keyframes glitch-border {
+            0% { border-color: var(--primary-color); }
+            50% { border-color: var(--secondary-color); }
+            100% { border-color: var(--primary-color); }
         }
 
         .terminal-header {
-            background: rgba(0, 17, 0, 0.9);
-            padding: 10px;
+            background: rgba(40, 0, 0, 0.5);
+            padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--primary-color);
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .social-links {
             display: flex;
-            gap: 10px;
+            gap: 15px;
         }
 
         .social-button {
             background: transparent;
-            border: 1px solid var(--secondary-color);
-            border-radius: 2px;
-            padding: 5px 10px;
+            border: 1px solid var(--primary-color);
+            padding: 4px 12px;
             color: var(--text-color);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.8em;
+            font-size: 0.75em;
+            transition: 0.3s;
         }
 
         .social-button:hover {
-            background: rgba(0, 255, 65, 0.1);
-            border-color: var(--text-color);
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: var(--glow);
         }
 
         .terminal {
             flex: 1;
-            padding: 15px;
+            padding: 20px;
             overflow-y: auto;
-            background: rgba(0, 17, 0, 0.9);
+            scrollbar-width: thin;
         }
 
         .input-line {
             display: flex;
-            margin-top: 10px;
-            border-top: 1px solid var(--secondary-color);
+            margin-top: 15px;
+            border-top: 1px dashed var(--secondary-color);
             padding-top: 10px;
         }
 
         .prompt {
-            color: var(--text-color);
+            color: var(--secondary-color);
             margin-right: 10px;
+            text-shadow: var(--glow);
         }
 
         .command-input {
             background: transparent;
             border: none;
-            color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
+            color: #fff;
+            font-family: inherit;
             font-size: 1em;
             flex: 1;
             outline: none;
         }
 
         .output-line {
-            margin: 5px 0;
+            margin: 4px 0;
             white-space: pre-wrap;
-            line-height: 1.4;
+            line-height: 1.5;
+            text-shadow: 0 0 5px rgba(255, 0, 60, 0.3);
         }
 
-        .output-line.error { color: #ff4444; }
-        .output-line.success { color: var(--text-color); }
+        .output-line.error { color: #fff; background: #ff003c; padding: 0 5px; }
+        .output-line.success { color: #00ffcc; }
         .output-line.info { color: var(--secondary-color); }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 17, 0, 0.7);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--secondary-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-color);
-        }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); }
     </style>
 </head>
 <body>
-    <canvas id="matrix-background" width="1900" height="900"></canvas>
+    <canvas id="matrix-background"></canvas>
+    
     <div class="terminal-window">
         <div class="terminal-header">
-            <span>ACT PLATFORM v1/z $ACTGEN</span>
+            <span>[ PSYOP_PLATFORM // NEURAL_OS_v2.6 ]</span>
             <div class="social-links">
-                <a href="https://x.com/ActGen_Platform" target="_blank" class="social-button">pumpfun</a>
-                <a href="https://x.com/ActGen_Platform" target="_blank" class="social-button">Twitter</a>
-                <a href="https://x.com/ActGen_Platform" target="_blank" class="social-button">CA</a>
+                <a href="#" class="social-button">PUMP_PORTAL</a>
+                <a href="#" class="social-button">X_FEED</a>
+                <a href="#" class="social-button">MANIFESTO</a>
             </div>
         </div>
         <div class="terminal">
-            <div class="history"><div class="output-line info">Initializing your first trade...</div><div class="output-line info">Type 'help' for available commands</div></div>
+            <div class="history">
+                <div class="output-line">Establishing secure neural link...</div>
+                <div class="output-line">Synchronizing cognitive buffers...</div>
+                <div class="output-line success">WELCOME TO THE PSYOP. EVERYTHING YOU SEE IS A CONSTRUCT.</div>
+                <div class="output-line info">Type 'help' to begin the overwrite.</div>
+            </div>
             <div class="input-line">
-                <span class="prompt">&gt;</span>
-                <input type="text" class="command-input" autofocus="">
+                <span class="prompt">User@Psyop:~#</span>
+                <input type="text" class="command-input" autofocus>
             </div>
         </div>
     </div>
 
     <script>
-        // Matrix Background code
+        // Matrix-style Glitch Background
         const canvas = document.getElementById('matrix-background');
         const ctx = canvas.getContext('2d');
 
-        function resizeCanvas() {
+        function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resize', resize);
+        resize();
 
-        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'.split('');
-        const drops = [];
-        const fontSize = 1;
+        const chars = '0101010101010101PSYOPPSYOPNEURALERROR'.split('');
+        const fontSize = 14;
         const columns = canvas.width / fontSize;
-
-        for (let i = 0; i < columns; i++) {
-            drops[i] = 1;
-        }
+        const drops = Array(Math.floor(columns)).fill(1);
 
         function draw() {
-            ctx.fillStyle = 'rgba(0, 17, 0, 0.02)';
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = 'rgba(0, 255, 65, 0.8)';
+            ctx.fillStyle = Math.random() > 0.95 ? '#fff' : '#400040';
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
-                const char = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
         }
+        setInterval(draw, 33);
 
-        function animate() {
-            draw();
-            requestAnimationFrame(animate);
-        }
-        animate();
-
+        // Terminal Logic
         const terminal = {
             history: document.querySelector('.history'),
             input: document.querySelector('.command-input'),
-            commandHistory: [],
-            commandIndex: -1,
-
-            // Hardcoded QuantAI16Z token information
-            tokenInfo: {
-                name: "Trading Terminal",
-                symbol: "$QuantAI16Z",
-                totalSupply: "1,000,000,000",
-                decimals: "18",
-                contractAddress: "ChE21vTgrkTKr8zrt2SZMJs86epPQCDyLseKqH3Hpump",
-                price: "$0.000014",
-                holders: "Loading..."
-            },
-
-            // New helper function for generating simulated volume data
-            generateVolumeData() {
-                const tokens = [
-                    { symbol: '$DOGE', volume: 352, description: 'Potential Breakout' },
-                    { symbol: '$PEPE', volume: 276, description: 'High Movement' },
-                    { symbol: '$SHIB', volume: 195, description: 'Significant Interest' },
-                    { symbol: '$QuantAI16Z', volume: 87, description: 'Steady Increase' }
-                ];
-
-                return tokens.map(token => 
-                    `${token.symbol}: 24hr Volume +${token.volume}% (${token.description})`
-                ).join('\n');
-            },
-
-            // New helper function for generating insider trading data
-            generateInsiderData() {
-                const wallets = [
-                    { 
-                        address: '7x8zB...q2Kf', 
-                        action: 'Bought', 
-                        amount: '500,000', 
-                        value: '$75', 
-                        timestamp: '2 hours ago' 
-                    },
-                    { 
-                        address: 'bN4kY...sQjn', 
-                        action: 'Accumulated', 
-                        amount: '1,200,000', 
-                        value: '$168', 
-                        timestamp: '4 hours ago' 
-                    },
-                    { 
-                        address: 'gTb5x...Y6rw', 
-                        action: 'Partial Sell', 
-                        amount: '250,000', 
-                        value: '$35', 
-                        timestamp: '6 hours ago' 
-                    }
-                ];
-
-                return wallets.map(wallet => 
-                    `1. Wallet ${wallet.address}: 
-   - ${wallet.action} ${wallet.amount} $QuantAI16Z
-   - Transaction Value: ${wallet.value}
-   - Timestamp: ${wallet.timestamp}`
-                ).join('\n\n');
+            
+            token: {
+                name: "Psyop Engine",
+                symbol: "$PSYOP",
+                supply: "1,000,000,000",
+                address: "PSY0P_CONTRACT_ADDRESS_V2",
+                status: "COGNITIVE_OVERRIDE_ACTIVE"
             },
 
             commands: {
                 help: () => ({
-                    text: `Available Commands:
-help              - Show this help message
-clear             - Clear terminal screen
-supply            - Show total supply of $QuantAI16Z token
-ticker            - Show token ticker/symbol
-info              - Show all $QuantAI16Z token information
-holders           - Show number of token holders
-tx                - Show recent transactions
-status            - Show terminal status
-scanvolume        - Scan for potential volume trades
-scaninsider       - Scan for new trades on insider wallets`,
+                    text: `SYSTEM COMMANDS:
+-----------------------------------------
+manifesto    - View the Psyop 2026 philosophy
+neuro-scan   - Detect cognitive bias in market volume
+status       - Check neural link integrity
+info         - View $PSYOP token parameters
+social-eng   - Analyze sentiment manipulation levels
+clear        - Purge terminal history
+override     - [REDACTED]`,
                     type: 'info'
                 }),
 
-                clear: () => {
-                    terminal.history.innerHTML = '';
-                    return { text: '', type: 'success' };
-                },
-
-                supply: () => ({ 
-                    text: `Total Supply: ${terminal.tokenInfo.totalSupply} ${terminal.tokenInfo.symbol}`,
-                    type: 'success'
-                }),
-
-                ticker: () => ({ 
-                    text: `Token Symbol: ${terminal.tokenInfo.symbol}`,
+                manifesto: () => ({
+                    text: `THE PSYOP MANIFESTO:
+1. Reality is a shared hallucination.
+2. Markets are psychological warfare.
+3. $PSYOP is the tool to reclaim the narrative.
+4. Do not believe what you see. Believe what we project.`,
                     type: 'success'
                 }),
 
                 info: () => ({
-                    text: `Token Information:
-Name: ${terminal.tokenInfo.name}
-Symbol: ${terminal.tokenInfo.symbol}
-Total Supply: ${terminal.tokenInfo.totalSupply}
-Decimals: ${terminal.tokenInfo.decimals}
-Contract: ${terminal.tokenInfo.contractAddress}`,
-                    type: 'info'
-                }),
-
-            
-                holders: () => ({ 
-                    text: `Total Holders: ${terminal.tokenInfo.holders}`, 
-                    type: 'success' 
-                }),
-
-                tx: () => ({
-                    text: `Recent Transactions:
-1. Bn4KYsAFd3tbM9kf3NgVMhGyCJX1EaRsQjnumsBwczhA: Buy 5415000 $QuantAI16Z
-2. nWEas68x83dpQ9CdQr1eU48kWhXXJNYuVcosYwaQe4m: Buy 4161000 $QuantAI16Z
-3. GtB5x82ENt4a5w2A1an356QkcVT54kE2sGV6zDaPY6rw: Sell 7464600 $QuantAI16Z`,
+                    text: `TOKEN METRICS:
+Asset: ${terminal.token.name}
+Ticker: ${terminal.token.symbol}
+Supply: ${terminal.token.supply}
+Protocol: Neuro-Linguistic Programming 4.0
+Address: ${terminal.token.address}`,
                     type: 'info'
                 }),
 
                 status: () => ({
-                    text: `Terminal Status:
-Token: ${terminal.tokenInfo.name}
-Commands Run: ${terminal.commandHistory.length}
-Time: ${new Date().toLocaleString()}`,
-                    type: 'info'
-                }),
-
-                // New Volume Scan Command
-                scanvolume: () => ({ 
-                    text: `Volume Scan Results:
-${terminal.generateVolumeData()}
-
-Criteria:
-- Volume > 200% average
-- Consistent Buy Pressure
-- Liquidity Check Passed`,
+                    text: `NEURAL LINK: STABLE
+SYNC RATE: 98.4%
+LATENCY: 4ms
+COGNITIVE LOAD: NORMAL`,
                     type: 'success'
                 }),
 
-                // New Insider Trading Scan Command
-                scaninsider: () => ({
-                    text: `Insider Trading Scan:
-${terminal.generateInsiderData()}
-
-Alert Levels:
-- High Accumulation Detected
-- Potential Price Movement Imminent`,
+                "neuro-scan": () => ({
+                    text: `SCANNING NEURAL NETWORKS...
+Result: High levels of "Retail Despair" detected.
+Recommended Action: Execute $PSYOP long position.
+Sentiment: Bullish Delusion initiated.`,
                     type: 'info'
-                })
+                }),
+
+                override: () => {
+                    document.body.style.animation = "shake 0.2s infinite";
+                    setTimeout(() => document.body.style.animation = "", 1000);
+                    return { text: "CRITICAL SYSTEM OVERRIDE... ACCESSING CORE... [ACCESS DENIED]", type: "error" };
+                },
+
+                clear: () => {
+                    terminal.history.innerHTML = '';
+                    return { text: '' };
+                }
             },
 
             async handleCommand(input) {
-                const [cmd, ...args] = input.trim().split(' ');
+                const cmd = input.toLowerCase().trim();
                 const command = this.commands[cmd];
-                if (!command) return { text: `Unknown command: ${cmd}. Type 'help' for commands.`, type: 'error' };
-                return await command(args);
+                if (!command) return { text: `COMMAND NOT RECOGNIZED: ${cmd}. ARE YOU GLITCHING?`, type: 'error' };
+                return await command();
             },
 
             addLine(text, type = '') {
@@ -373,42 +294,30 @@ Alert Levels:
             }
         };
 
-        // Input handling
         terminal.input.addEventListener('keydown', async (e) => {
             if (e.key === 'Enter') {
-                const input = terminal.input.value.trim();
+                const input = terminal.input.value;
                 if (input) {
-                    terminal.commandHistory.push(input);
-                    terminal.commandIndex = terminal.commandHistory.length;
-                    terminal.addLine('> ' + input);
+                    terminal.addLine(`User@Psyop:~# ${input}`);
                     const result = await terminal.handleCommand(input);
                     if (result.text) terminal.addLine(result.text, result.type);
                 }
                 terminal.input.value = '';
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (terminal.commandIndex > 0) {
-                    terminal.commandIndex--;
-                    terminal.input.value = terminal.commandHistory[terminal.commandIndex];
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (terminal.commandIndex < terminal.commandHistory.length - 1) {
-                    terminal.commandIndex++;
-                    terminal.input.value = terminal.commandHistory[terminal.commandIndex];
-                } else {
-                    terminal.commandIndex = terminal.commandHistory.length;
-                    terminal.input.value = '';
-                }
             }
         });
 
-        // Initial message
-        terminal.addLine('Initializing your first trade...', 'info');
-        terminal.addLine("Type 'help' for available commands", 'info');
-
-        // Keep focus on input
         document.addEventListener('click', () => terminal.input.focus());
     </script>
 
-</body></html>
+    <style>
+        /* Shake Animation for Override command */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            50% { transform: translate(-1px, 2px) rotate(1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
+</body>
+</html>
