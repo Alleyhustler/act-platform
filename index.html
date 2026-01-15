@@ -25,6 +25,26 @@
             overflow: hidden;
         }
 
+        /* --- NEW: RIGHT-CENTER BACKGROUND IMAGE STYLE --- */
+        .background-graphic {
+            position: fixed;
+            right: 5%; /* Distance from right edge */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px; /* Adjust size as needed */
+            height: auto;
+            z-index: 1; /* Above matrix, below terminal */
+            opacity: 0.4; /* Faded into background */
+            pointer-events: none; /* Allows clicking through to terminal */
+            filter: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(5); /* Makes image match the red theme */
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: translateY(-50%) scale(1); }
+            50% { opacity: 0.6; transform: translateY(-52%) scale(1.05); }
+        }
+
         /* Scanline Effect */
         body::before {
             content: " ";
@@ -55,7 +75,7 @@
             border: 1px solid var(--primary-color);
             position: relative;
             box-shadow: var(--glow), inset 0 0 20px rgba(112, 0, 255, 0.2);
-            z-index: 2;
+            z-index: 2; /* Keep terminal on top */
             display: flex;
             flex-direction: column;
             animation: glitch-border 5s infinite;
@@ -147,6 +167,10 @@
 </head>
 <body>
     <canvas id="matrix-background"></canvas>
+
+    <!-- NEW IMAGE ELEMENT -->
+    <!-- Replace 'YOUR_IMAGE_PATH.png' with your actual path -->
+    <img src="YOUR_IMAGE_PATH.png" class="background-graphic" alt="Psyop Visual">
     
     <div class="terminal-window">
         <div class="terminal-header">
@@ -221,11 +245,11 @@
                 help: () => ({
                     text: `SYSTEM COMMANDS:
 -----------------------------------------
+help         - Show this menu
 manifesto    - View the Psyop 2026 philosophy
 neuro-scan   - Detect cognitive bias in market volume
 status       - Check neural link integrity
 info         - View $PSYOP token parameters
-social-eng   - Analyze sentiment manipulation levels
 clear        - Purge terminal history
 override     - [REDACTED]`,
                     type: 'info'
@@ -310,7 +334,6 @@ Sentiment: Bullish Delusion initiated.`,
     </script>
 
     <style>
-        /* Shake Animation for Override command */
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
